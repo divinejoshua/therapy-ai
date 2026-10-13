@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Therapy AI
 
-## Getting Started
+A simple Next.js app where you can hop on a live voice call with **Sage**, a calm, supportive AI talk-therapy companion. It uses the OpenAI Realtime API over WebRTC for low-latency, natural back-and-forth conversation, with a live transcript and an optional text box.
 
-First, run the development server:
+> Therapy AI is not a licensed therapist and is not a substitute for professional care. If you are in crisis, contact your local emergency number or a crisis line (988 in the US, 116 123 in the UK & Ireland, or [findahelpline.com](https://findahelpline.com)).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Getting started
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Add your OpenAI API key:
 
-## Learn More
+   ```bash
+   cp .env.example .env.local
+   # then edit .env.local and set OPENAI_API_KEY
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. Run the dev server and open [http://localhost:3000](http://localhost:3000):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Click **Start session**, allow microphone access, and start talking.
 
-## Deploy on Vercel
+## How it works
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app/api/session/route.ts` uses your server-side `OPENAI_API_KEY` to mint a short-lived Realtime client secret, configured with the therapist instructions, voice, and transcription. Your real key never reaches the browser.
+- `src/hooks/useRealtimeCall.ts` opens a WebRTC connection straight to OpenAI with that ephemeral key, streams your microphone, plays the AI's voice, and listens on a data channel for transcript and speaking-state events.
+- `src/lib/therapist.ts` holds the therapist persona and safety boundaries. Edit it to change how Sage behaves.
+- `src/components/TherapySession.tsx` renders the call UI: the reactive voice orb, mute/end controls, call timer, live transcript, and text input.
